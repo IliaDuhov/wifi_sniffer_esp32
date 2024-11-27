@@ -1,27 +1,49 @@
-#include <Arduino.h>       
-#include "oled_display.h"  
-#include "wifi_sniffer.h"  
-#include "config.h"        
+#include <Arduino.h>
+#include "oled_display.h"
+#include "wifi_sniffer.h"
+#include "bluetooth_sniffer.h"
+#include "config.h"
 
-#define MAX_NETWORKS 10
+#define MAX_DISPLAY_ENTRIES 6 // Максимальное количество строк для отображения
 
-String ssids[MAX_NETWORKS];
-int deviceCounts[MAX_NETWORKS];
-int networkCount = 0;
+String ssids[MAX_DISPLAY_ENTRIES];
+int wifiSignalStrengths[MAX_DISPLAY_ENTRIES];
+int wifiNetworkCount = 0;
 
-unsigned long lastScanTime = 0; 
-const unsigned long scanInterval = 5000;
+String btDevices[MAX_DISPLAY_ENTRIES];
+int btSignalStrengths[MAX_DISPLAY_ENTRIES];
+int btDeviceCount = 0;
+
+unsigned long lastWiFiScan = 0;
+unsigned long lastBluetoothScan = 0;
 
 void setup() {
-    Serial.begin(115200);    
-    initDisplay();           
-    WiFi.mode(WIFI_MODE_STA); 
-    WiFi.disconnect();       
+    Serial.begin(115200);
+
+    initDisplay();
+
+    WiFi.mode(WIFI_MODE_STA);
+    WiFi.disconnect();
+
+    BLEDevice::init("");
 }
 
 void loop() {
-    scanNetworks(ssids, deviceCounts, networkCount); 
-    updateDisplay(ssids, deviceCounts, networkCount);
-    delay(5000);
-}
+    unsigned long currentMillis = millis();
 
+    // Сканируем Wi-Fi каждые WIFI_SCAN_INTERVAL мс
+    if (currentMillis - lastWiFiScan >= WIFI_SCAN_INTERVAL) {
+        lastWiFiScan = currentMillis;
+        scanWiFi(ssids, wifiSignalStrengths, wifiNetworkCount);
+        updateDisplay(WIFI_SCAN, ssids, wifiSignalStrengths, wifiNetworkCount);
+        delay(2000); // Пауза для отображения
+    }
+
+    // Сканируем Bluetooth каждые BLUETOOTH_SCAN_INTERVAL мс
+    if (currentMillis - lastBluetoothScan >= BLUETOOTH_SCAN_INTERVAL) {
+        lastBluetoothScan = currentMillis;
+        scanBluetooth(btDevices, btSignalStrengths, btDeviceCount);
+        updateDisplay(BLUETOOTH_SCAN, btDevices, btSignalStrengths, btDeviceCount);
+        delay(2000); // Пауза для отображения
+    }
+}

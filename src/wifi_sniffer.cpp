@@ -1,11 +1,11 @@
 #include "wifi_sniffer.h"
 
-void scanNetworks(String* ssids, int* deviceCounts, int& networkCount) {
-    int foundNetworks = WiFi.scanNetworks(); 
-    networkCount = (foundNetworks > WIFI_CHANNEL_MAX) ? WIFI_CHANNEL_MAX : foundNetworks;
+void scanWiFi(String* ssids, int* signalStrengths, int& networkCount) {
+    int n = WiFi.scanNetworks();
+    networkCount = n > 6 ? 6 : n;
 
     for (int i = 0; i < networkCount; i++) {
-        ssids[i] = WiFi.SSID(i);    
-        deviceCounts[i] = WiFi.RSSI(i); 
+        ssids[i] = WiFi.SSID(i);
+        signalStrengths[i] = WiFi.RSSI(i);
     }
 }

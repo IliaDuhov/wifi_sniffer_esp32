@@ -1,25 +1,33 @@
 #include "oled_display.h"
 
-Adafruit_SSD1306 display(128, 64, &Wire, -1); // Инициализация дисплея
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 void initDisplay() {
-    Wire.begin(OLED_SDA, OLED_SCL); // Инициализация I2C шины
+    Wire.begin(OLED_SDA, OLED_SCL);
     if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
         Serial.println("OLED init failed!");
-        ESP.restart(); // Перезагрузка в случае ошибки
+        ESP.restart();
     }
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.display();
 }
 
-void updateDisplay(const String* ssids, const int* deviceCounts, int networkCount) {
+void updateDisplay(ScanType scanType, const String* data, const int* values, int count) {
+    const int maxLines = 6;
     display.clearDisplay();
     display.setTextSize(1);
+    display.setCursor(0, 0);
 
-    for (int i = 0; i < networkCount && i < 6; i++) { // Ограничение на 6 строк
-        display.setCursor(0, i * 10);
-        display.printf("%s: %d", ssids[i].c_str(), deviceCounts[i]);
+    if (scanType == WIFI_SCAN) {
+        display.println("Wi-Fi Scan");
+    } else {
+        display.println("Bluetooth Scan");
+    }
+
+    for (int i = 0; i < count && i < maxLines; i++) {
+        display.setCursor(0, 10 + i * 10);
+        display.printf("%s: %d", data[i].c_str(), values[i]);
     }
 
     display.display();
