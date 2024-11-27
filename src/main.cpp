@@ -4,7 +4,7 @@
 #include "bluetooth_sniffer.h"
 #include "config.h"
 
-#define MAX_DISPLAY_ENTRIES 6
+#define MAX_DISPLAY_ENTRIES 6 // Максимальное количество строк для отображения
 
 String ssids[MAX_DISPLAY_ENTRIES];
 int wifiSignalStrengths[MAX_DISPLAY_ENTRIES];
@@ -31,6 +31,7 @@ void setup() {
 void loop() {
     unsigned long currentMillis = millis();
 
+    
     if (currentMillis - lastWiFiScan >= WIFI_SCAN_INTERVAL) {
         lastWiFiScan = currentMillis;
         scanWiFi(ssids, wifiSignalStrengths, wifiNetworkCount);
