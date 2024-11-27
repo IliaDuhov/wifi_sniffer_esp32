@@ -7,7 +7,7 @@ void scanBluetooth(String* deviceNames, int* rssiValues, int& deviceCount) {
     BLEScanResults scanResults = pBLEScan->start(3, false);
 
     int n = scanResults.getCount();
-    deviceCount = n > 6 ? 6 : n; // Лимитируем до 6 устройств
+    deviceCount = n > 6 ? 6 : n;
 
     for (int i = 0; i < deviceCount; i++) {
         BLEAdvertisedDevice device = scanResults.getDevice(i);
